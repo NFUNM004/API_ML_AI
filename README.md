@@ -24,4 +24,4 @@
  
 #### API调用
 - 词语词性识别：
-待上传
+![词语词性识别](https://github.com/NFUNM004/API_ML_AI/blob/master/%E8%AF%8D%E8%AF%AD%E8%AF%8D%E6%80%A7%E8%AF%86%E5%88%AB.png "词语词性识别")
