@@ -34,5 +34,47 @@
  ![原型1](https://github.com/NFUNM004/API_ML_AI/blob/master/yuanxi1.PNG "原型1")
  
 #### API调用
+
 - 词语词性识别：
+
+百度：百度词法分析向用户提供分词、词性标注、专名识别三大功能，能够识别出文本串中的基本语音元素，对这些词汇进行重组、标注组合后词汇的词性。
+
 ![词语词性识别](https://github.com/NFUNM004/API_ML_AI/blob/master/%E8%AF%8D%E8%AF%AD%E8%AF%8D%E6%80%A7%E8%AF%86%E5%88%AB.png "词语词性识别")
+
+- 识别结果
+
+```
+{'log_id': 4567722688321243111,
+ 'text': '我有一头牛',
+ 'items': [{'loc_details': [],
+   'byte_offset': 0,
+   'uri': '',
+   'pos': 'r',
+   'ne': '',
+   'item': '我',
+   'basic_words': ['我'],
+   'byte_length': 2,
+   'formal': ''},
+  {'loc_details': [],
+   'byte_offset': 2,
+   'uri': '',
+   'pos': 'v',
+   'ne': '',
+   'item': '有',
+   'basic_words': ['有'],
+   'byte_length': 2,
+   'formal': ''},
+  {'loc_details': [],
+   'byte_offset': 4,
+   'uri': '',
+   'pos': 'n',
+   'ne': '',
+   'item': '一头牛',
+   'basic_words': ['一', '头', '牛'],
+   'byte_length': 6,
+   'formal': ''}]}
+```
+
+
+- 清华大学词法分析器（THU Lexical Analyzer for Chinese，THULAC）：THULAC由清华大学自然语言处理与社会人文计算实验室研制推出的一套中文词法分析工具包，具有中文分词和词性标注功能。
+
