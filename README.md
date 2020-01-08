@@ -32,9 +32,29 @@
 |  2 |句子结构识别|  一句主谓宾的句子，但用户无法分辨哪个词是谓语，哪个词是宾语，希望能够通过软件了解句子的结构和词语间的关系  |  最重要   |
 |  3 |  文字识别  |  在不认识某些字或字太大，不想打字的情况下，用户需要一个方便快捷的方式输入文字，用此方法识别图片中的文字，实现快捷输入   |  一般   | 
 
-### 原型
-制作中，未上传
- ![原型1](https://github.com/NFUNM004/API_ML_AI/blob/master/yuanxi1.PNG "原型1")
+## 原型
+### 产品架构图
+![架构图.JPG](https://upload-images.jianshu.io/upload_images/9779994-86624c3cdd1e691f.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+### 产品原型
+- 词性分析功能流程
+![流程图1.JPG](https://upload-images.jianshu.io/upload_images/9779994-f3b07051f775fccc.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![流程2.JPG](https://upload-images.jianshu.io/upload_images/9779994-d269095dd2a32f9b.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 句法分析功能流程
+![句法流程1.JPG](https://upload-images.jianshu.io/upload_images/9779994-a0765a2a5a856ff3.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+![句法流程2.JPG](https://upload-images.jianshu.io/upload_images/9779994-7f394d853bfe0bc6.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+- 练习功能流程
+![练习.JPG](https://upload-images.jianshu.io/upload_images/9779994-a83a6ceabd1e3fae.JPG?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+### 原型文档
+- [“汉语通”原型文档](http://nfunm004.gitee.io/api_hanyutong_app/#g=1&p=%E4%BA%A7%E5%93%81%E6%9E%B6%E6%9E%84%E5%9B%BE)
+- [“汉语通”原型文档下载](https://gitee.com/NFUNM004/api_hanyutong_app/blob/master/%E6%B1%89%E8%AF%AD%E9%80%9Aapp.rp)
+
  
 #### API调用
 
