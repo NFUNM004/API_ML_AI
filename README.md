@@ -13,7 +13,7 @@
 
 
 ### 加值宣言：
-本APP运用人工智能自然语言处理技术，通过词法分析识别出文本串中的词性，帮助用户辨别词语词性；通过依存句法分析分析句子的的句法结构信息，有助于用户分辨句子结构；通过文字识别技术，识别用户上传的图像中的文本。
+本APP运用人工智能自然语言处理技术，通过词法分析识别出文本串中的词性，帮助用户辨别词语词性；通过依存句法分析分析句子的的句法结构信息，有助于用户分辨句子结构；通过通用文字识别技术，识别用户上传的图像中的文本。
 
 ### 用户痛点：
 - 了解汉语的词性、句子的结构等，对汉语听说和写作都是一个很重要的打基础的过程。但汉语相比其它语言，具有词汇量大，句式复杂的特点，许多刚接触汉语或正在学习汉语的外国人，常常会陷入迷茫。
@@ -55,13 +55,15 @@
 - [“汉语通”原型文档](http://nfunm004.gitee.io/api_hanyutong_app/#g=1&p=%E4%BA%A7%E5%93%81%E6%9E%B6%E6%9E%84%E5%9B%BE)
 - [“汉语通”原型文档下载](https://gitee.com/NFUNM004/api_hanyutong_app/blob/master/%E6%B1%89%E8%AF%AD%E9%80%9Aapp.rp)
 
- 
-#### API调用
+---
+## API
 
-- 词语词性识别：
+### API调用：
 
-- 百度词法分析调用代码:
-```
+#### 词法识别API：
+
+- 百度词法分析API调用代码:
+```python
 from aip import AipNlp
 APP_ID = 'my ID'
 API_KEY = 'my api_key'
@@ -71,9 +73,7 @@ text = "我有一头牛"
 client.lexer(text)
 ```
 
-
 - 识别结果:
-
 ```
 {'log_id': 4567722688321243111,
  'text': '我有一头牛',
@@ -108,35 +108,77 @@ client.lexer(text)
 
 - 清华大学词法分析器（THU Lexical Analyzer for Chinese，THULAC）调用代码：
 
-```  
+```python
 import thulac  
 thu1 = thulac.thulac() 
 text = thu1.cut("我有一头牛", text=True) 
 print(text)
-
 ```
 
 - 识别结果
 ```我_r 有_v 一_m 头_q 牛_n ```
 
+- 讯飞词法分析 API 调用代码：
 
-- 调用结果分析：在分词、词性识别上有些许不同，如上面代码，百度API在分析句子“我有一头牛”时将“一头牛”划分为名词词组，但若用户要求更精准的分析，应当和下面一样，“一头牛”三个字分别应当对应数词、量词和名词。同时二者都难以准确判断如“人要是行，干一行行一行”这种带有歧义的句子，需要手动用标点符号将句子分割为“人要是行，干一行，行一行”，才能准确判断。
+```python
+import time
+import urllib.request
+import urllib.parse
+import json
+import hashlib
+import base64
+url ="http://ltpapi.xfyun.cn/v1/pos"
+x_appid = "my id"
+api_key = "my key"
+TEXT="我有一头牛。"
+
+def main():
+    body = urllib.parse.urlencode({'text':TEXT}).encode('utf-8')
+
+    param = {"type": "dependent"}
+    x_param = base64.b64encode(json.dumps(param).replace(' ', '').encode('utf-8'))
+    x_time = int(int(round(time.time() * 1000)) / 1000)
+    x_checksum = hashlib.md5(api_key.encode('utf-8') + str(x_time).encode('utf-8') + x_param).hexdigest()
+    x_header = {'X-Appid': x_appid,
+                'X-CurTime': x_time,
+                'X-Param': x_param,
+                'X-CheckSum': x_checksum}
+    req = urllib.request.Request(url, body, x_header)
+    result = urllib.request.urlopen(req)
+    result = result.read()
+    print(result.decode('utf-8'))
+    return
+if __name__ == '__main__':
+    main()
+
+```
+
+- 输出结果：
+```
+{"code":"0","data":{"pos":["r","v","m","q","n","wp"]},"desc":"success","sid":"ltp0040e017@dx4edf1171d065000100"}
+```
+
+
+- 调用结果分析：
+- 经过调用，发现三者词法分析的结果大多一致。除了百度词法分析API在分析句子“我有一头牛”时将“一头牛”划分为名词词组，若用户要求更精准的分析，需参考THULAC和讯飞，“一头牛”三个字应当分别对应数词、量词和名词。
+- 三者都难以准确判断如“人要是行，干一行行一行”这种带有歧义或标点符号缺失的句子，需要手动用标点符号将句子分割为“人要是行，干一行，行一行”，才能准确判断。
 
 ###  API使用比较分析：
+|          | 百度词法分析API                                                                                 |                            THULAC                                         |                 讯飞词法分析API                                          |
+| -------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 准确度   |                                         较高                                                 |                            高                                             |                            高                                             | 
+| 判断速度 |                                         快                                              |                                 快                                            |                                     快                                        |
+| 成熟程度 | 对领域新词、专有名词的识别有效程度显著，目前百度词法分析在算法效果上领先主流中文词法分析模型 | 集成目前世界上规模最大的人工分词和词性标注中文语料库（含5800万字）训练而成 |以哈工大社会计算与信息检索研究中心研发的 “语言技术平台（LTP）” 为基础，提供高效精准的简体中文自然语言处理服务                               |
+| 价格     | 可免费调用50w次，5QPS/天；付费后能提升秒查询率和售后客服的效率，也可购买定制版               | 未知，商业合作需要邮箱进行交涉                                             |   免费调用：分词、词性标注每日服务量各500次，提升限额价格未知        |
 
-
-|          | 百度词法分析                                                                                 | THULAC                                                                     |
-| -------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| 准确度   |                                         较高                                                 |                            高                                             |
-| 判断速度 |                                         快                                              |                                 快                                            |
-| 成熟程度 | 对领域新词、专有名词的识别有效程度显著，目前百度词法分析在算法效果上领先主流中文词法分析模型 | 集成目前世界上规模最大的人工分词和词性标注中文语料库（含5800万字）训练而成 |
-| 价格     | 可免费调用50w次，5QPS/天；付费后能提升秒查询率和售后客服的效率，也可购买定制版               | 未知，商业合作需要邮箱进行交涉                                             |
 
 ---
-### 依存句法分析API
+
+
+#### 依存句法分析API：
 
 - 百度依存句法分析API代码调用：
-```
+```python
 from aip import AipNlp
 APP_ID = 'my ID'
 API_KEY = 'my api_key'
@@ -150,8 +192,7 @@ client.depParser(text, options)
 ```
 
 - 调用结果：
-
-```
+```python
 {'log_id': 3077095668848504904,
  'text': '智能化时代的来临，使汽车从一次性交付产品成为可以无限迭代的智能终端',
  'items': [{'postag': 'vn',
@@ -175,8 +216,57 @@ client.depParser(text, options)
   {'postag': 'v', 'head': 16, 'word': '迭代', 'id': 15, 'deprel': 'DE'},
   {'postag': 'u', 'head': 17, 'word': '的', 'id': 16, 'deprel': 'DE'},
   {'postag': 'n', 'head': 12, 'word': '智能终端', 'id': 17, 'deprel': 'VOB'}]}
+ 
 ```
 
-API3.使用后风险报告 
+- 讯飞依存句法分析API代码调用：
+```python
+import time
+import urllib.request
+import urllib.parse
+import json
+import hashlib
+import base64
+
+url ="http://ltpapi.xfyun.cn/v1/dp"
+x_appid = "my id"
+api_key = "my key"
+TEXT="智能化时代的来临，使汽车从一次性交付产品成为可以无限迭代的智能终端。"
+
+def main():
+    body = urllib.parse.urlencode({'text':TEXT}).encode('utf-8')
+    param = {"type": "dependent"}
+    x_param = base64.b64encode(json.dumps(param).replace(' ', '').encode('utf-8'))
+    x_time = int(int(round(time.time() * 1000)) / 1000)
+    x_checksum = hashlib.md5(api_key.encode('utf-8') + str(x_time).encode('utf-8') + x_param).hexdigest()
+    x_header = {'X-Appid': x_appid,
+                'X-CurTime': x_time,
+                'X-Param': x_param,
+                'X-CheckSum': x_checksum}
+    req = urllib.request.Request(url, body, x_header)
+    result = urllib.request.urlopen(req)
+    result = result.read()
+    print(result.decode('utf-8'))
+    return
+
+if __name__ == '__main__':
+    main()
+```
+
+- 输出结果：
+```
+{"code":"0","data":{"dp":[{"parent":1,"relate":"ATT"},{"parent":3,"relate":"ATT"},{"parent":1,"relate":"RAD"},{"parent":5,"relate":"SBV"},{"parent":3,"relate":"WP"},{"parent":-1,"relate":"HED"},{"parent":5,"relate":"DBL"},{"parent":11,"relate":"ADV"},{"parent":10,"relate":"ATT"},{"parent":10,"relate":"ATT"},{"parent":7,"relate":"POB"},{"parent":5,"relate":"VOB"},{"parent":11,"relate":"VOB"},{"parent":14,"relate":"ATT"},{"parent":17,"relate":"ATT"},{"parent":14,"relate":"RAD"},{"parent":17,"relate":"ATT"},{"parent":12,"relate":"VOB"},{"parent":5,"relate":"WP"}]},"desc":"success","sid":"ltp0040902d@dx23571171cf3ea00100"}
+```
+
+### API使用比较分析
+|          | 百度词法分析API                                                                               |                 讯飞词法分析API                                          |
+| -------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| 准确度   |                                         较高                                                 |                            高                                             |                            高                                             | 
+| 判断速度 |                                         快                                              |                                 快                                            |                                     快                                        |
+| 成熟程度 | 对领域新词、专有名词的识别有效程度显著，目前百度词法分析在算法效果上领先主流中文词法分析模型 | 集成目前世界上规模最大的人工分词和词性标注中文语料库（含5800万字）训练而成 |以哈工大社会计算与信息检索研究中心研发的 “语言技术平台（LTP）” 为基础，提供高效精准的简体中文自然语言处理服务                               |
+| 价格     | 可免费调用50w次，5QPS/天；付费后能提升秒查询率和售后客服的效率，也可购买定制版               | 未知，商业合作需要邮箱进行交涉                                             |   免费调用：分词、词性标注每日服务量各500次，提升限额价格未知        |
+
+
+### 使用后风险报告 
 - 自然语言分析API市场竞争程度中等，较多大型企业都有进行尝试，但做得十分出色的较少。随着汉语热不断兴起、人工智能审核中文文本的市场地提升、语言分析模型地精进等，此类API拥有较大的未来发展可能性。
 - 大部分词语词性分析、依存语法分析API对于输入的文本都有字数限制。
